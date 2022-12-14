@@ -1,0 +1,1395 @@
+{
+	"info": {
+		"_postman_id": "5ddc3186-c8ff-4b7e-b04d-7dc9f512572e",
+		"name": "ISCUSRV-40163",
+		"description": "Sjekk oversikt av API'er fra [dokumentasjonen fra Elvia](https://cgi-no-utility.atlassian.net/browse/ISCUSRV-39714?focusedCommentId=431697).\n\nFoldere dekker følgende:\n\n- Meter setup and revert and alter POC.description\n    - MP1, MP2, MP3, MP6\n- Customer New and change\n    - KD1, KD2\n- SalesOrder Terminate and Annul\n    - ??\n- Supplier change and Revert\n    - ??\n- Settlement Method change and revert\n    - ??",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14980609"
+	},
+	"item": [
+		{
+			"name": "Meter setup and revert and alter POC.description",
+			"item": [
+				{
+					"name": "Create Meter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Opprette måler\r",
+									"\r",
+									"try {\r",
+									"\r",
+									"    pm.test(\"Create meter: Status code is 201\", function () {\r",
+									"        pm.response.to.have.status(201);\r",
+									"    });\r",
+									"\r",
+									"    var tMeterIdCreated = pm.collectionVariables.get('colMeterIdChangeTo');\r",
+									"\r",
+									"    if (pm.response.code == 201) {\r",
+									"        console.log ('\\tCreate meter: målerId: '.padEnd(100,'.') + tMeterIdCreated);\r",
+									"    } else {\r",
+									"        throw('Not able to create new meter with ID: ' + tMeterIdCreated);\r",
+									"    }\r",
+									"\r",
+									"\r",
+									"} catch (err) {\r",
+									"    postman.setNextRequest(null);\r",
+									"    console.error(err);\r",
+									"};"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Setter neste løpenummer på \"colExternalCustomerId\"\r",
+									"\r",
+									"const tVar = setNextId('colMeterIdChangeTo');\r",
+									"//    console.log('\\tHER KOMMER NY ID: '.padEnd(50,'.') + tVar);\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									"//  FUNKSJONSAVDELINGEN\r",
+									"function setNextId(pVariable) {\r",
+									"            \r",
+									"    const tId = pm.collectionVariables.get(pVariable).split('-');\r",
+									"//        console.log(tId);\r",
+									"    const tCounter = parseInt(tId[tId.length - 1]) + 1;\r",
+									"//        console.log('Neste verdi = ' + tCounter);\r",
+									"    \r",
+									"    var tNewID = \"\";\r",
+									"    for (i=0;i<tId.length-1;i++) {\r",
+									"        tNewID = tNewID + tId[i] + '-';\r",
+									"    }\r",
+									"//        console.log('Da er vi kommet hit hvor tNewID er: '  + tNewID);\r",
+									"    tNewID = tNewID + tCounter;\r",
+									"    pm.collectionVariables.set(pVariable, tNewID);\r",
+									"\r",
+									"    return tNewID\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": \"{{colMeterIdChangeTo}}\",\r\n  \"master\": {\r\n    \"id\": \"4Q-TP\"\r\n  },\r\n  \"statusCode\": \"2\",\r\n  \"statusChangedDate\": \"2022-01-01\",\r\n  \"storage\": {\r\n    \"id\": \"14\"\r\n  },\r\n  \"storageChangedDate\": \"2022-01-01\",\r\n  \"brandYear\": 2022,\r\n  \"operatingUnit\": {\r\n    \"id\": \"1\"\r\n  },\r\n  \"brand\": \"eda Elvia test\",\r\n  \"revisionPeriod\": 3,\r\n  \"revisionYear\": 2025,\r\n  \"batteryDate\": \"2025-01-01\",\r\n  \"operatingUnitType\": \"EL\",\r\n  \"meterFunction\": {\r\n    \"id\": \"SKA-04\"\r\n   }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/components/meters",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"components",
+								"meters"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Meter Change",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Her må meterIdChangTo settes til meterId\r",
+									"\r",
+									"try {\r",
+									"\r",
+									"    pm.test(\"Meter Change: Status code is 200\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"\r",
+									"    const tMeterIdChangeTo = pm.collectionVariables.get('colMeterIdChangeTo');\r",
+									"\r",
+									"    if (pm.response.code == 200) {\r",
+									"        console.log ('\\tMeter Change: Ny målerId: '.padEnd(100,'.') + tMeterIdChangeTo);\r",
+									"    } else {\r",
+									"        throw('Not able to change to new meter with ID: ' + tMeterIdChangeTo);\r",
+									"    }\r",
+									"\r",
+									"} catch (err) {\r",
+									"    postman.setNextRequest(null);\r",
+									"    console.error(err);\r",
+									"};"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\r\n    \"changeDate\": \"{{colMeterChangeDate}}\",\r\n\r\n    \"meter\": {\r\n      \"meterNr\": \"{{colMeterIdChangeTo}}\"\r\n    }\r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/metersetups/{{colObjectId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"metersetups",
+								"{{colObjectId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Place Of Consumtion description",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// SLETTER SISTE MÅLERBYTT\r",
+									"\r",
+									"try {\r",
+									"\r",
+									"    pm.test(\"Update Place Of Consumtion description: Status code is 204\", function () {\r",
+									"        pm.response.to.have.status(204);\r",
+									"    });\r",
+									"\r",
+									"    \r",
+									"\r",
+									"    var tBodyDesc = JSON.parse(pm.request.body);\r",
+									"    var tDesc = tBodyDesc.description;\r",
+									"    var tEAN = tBodyDesc.meterPointId;\r",
+									"\r",
+									"    //console.log('Beskrivelsen på EAN: ' + tEAN + ' er oppdatert til: \"' + tDesc + '\"');\r",
+									"    \r",
+									"    var tHTTPStatus = pm.response.code;\r",
+									"    switch (tHTTPStatus) {\r",
+									"        case 204:\r",
+									"            console.log ('\\tBeskrivelsen på EAN: ' + tEAN + ' er oppdatert til: '.padEnd(100,'.') + '\"' + tDesc + '\"');\r",
+									"            break;\r",
+									"        case 400:\r",
+									"            throw ('MeterChange failed: Sjekk kallet.');\r",
+									"\r",
+									"        case 404:\r",
+									"            throw ('MeterChange for MeterId: ' + pm.collectionVariables.get('meterIdChangeTo') + ' could not be found.');\r",
+									"            //break;\r",
+									"        case 405:\r",
+									"            throw ('Ukjent feil....: Status = 405??');\r",
+									"            //break;\r",
+									"\r",
+									"        default :\r",
+									"            console.log ('THIS SHOULD NEVER HAPPEN - HTTP-Status = ' + tHTTPStatus);\r",
+									"    }\r",
+									"\r",
+									"} catch (err) {\r",
+									"    postman.setNextRequest(null);\r",
+									"    console.error(err);\r",
+									"};"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"meterPointId\": \"{{colObjectId}}\",\r\n  \"description\": \"{{colPlaceOfConsumtionDescription}}\"\r\n   \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/placeofconsumptions/meterPointId/{{colObjectId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"placeofconsumptions",
+								"meterPointId",
+								"{{colObjectId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Revert last Meter Change",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// SLETTER SISTE MÅLERBYTT\r",
+									"\r",
+									"try {\r",
+									"\r",
+									"    pm.test(\"Delete last Meter Change: Status code is 200\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"    \r",
+									"    var tHTTPStatus = pm.response.code;\r",
+									"    switch (tHTTPStatus) {\r",
+									"        case 200:\r",
+									"            console.log ('\\tRevert last Meter Change: MeterId: '.padEnd(100,'.') + pm.collectionVariables.get('colMeterIdChangeTo'));\r",
+									"            break;\r",
+									"        case 400:\r",
+									"            throw ('MeterChange failed: Sjekk kallet.');\r",
+									"\r",
+									"        case 404:\r",
+									"            throw ('MeterChange for MeterId: ' + pm.collectionVariables.get('meterIdChangeTo') + ' could not be found.');\r",
+									"            //break;\r",
+									"        case 405:\r",
+									"            throw ('Ukjent feil....: Status = 405??');\r",
+									"            //break;\r",
+									"\r",
+									"        default :\r",
+									"            console.log ('THIS SHOULD NEVER HAPPEN');\r",
+									"    }\r",
+									"\r",
+									"} catch (err) {\r",
+									"    postman.setNextRequest(null);\r",
+									"    console.error(err);\r",
+									"};"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"/*\r",
+									"try {\r",
+									"\r",
+									"//    let tHasValue = pm.collectionVariables.get(\"meterIdChangeTo\");\r",
+									"\r",
+									"    if (pm.collectionVariables.get(\"meterIdChangeTo\") != null) {\r",
+									"        console.log('meterIdChangeTo = ' + pm.collectionVariables.get(\"meterIdChangeTo\"))\r",
+									"    } else {\r",
+									"        console.log('meterIdChangeTo is null')\r",
+									"    }\r",
+									"    \r",
+									"\r",
+									"\r",
+									"} catch (err) {\r",
+									"    postman.setNextRequest(null);\r",
+									"    console.error(err);\r",
+									"}\r",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/metersetups/{{colMeterIdChangeTo}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"metersetups",
+								"{{colMeterIdChangeTo}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Meter Create - Setup - Revert\n\nFølgende Collectionvariable må settes før start:\n\n- colObjectId (EAN)\n- colMeterIdChangeTo (Verifisere at den har verdi. Løpenummer inkrementeres med +1)\n- colPlaceOfConsumtionDescription (Verifisere at den har verdi)\n    \n\nPå gitt leveringspunkt skjer følgende:\n\n- Oppretter måler - MP6 - Opprette måler\n- Bytter til ny måler - MP1 - Bytte måler\n- Oppdatere beskrivelse på forbrukssted - MP2 - Endre målepunktegenskaper\n- Sletter siste måleroppsett - MP3 - Reversere målerbytte"
+		},
+		{
+			"name": "Customer New and change",
+			"item": [
+				{
+					"name": "Setting EAN, meterId, ExternalId, TS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"try {\r",
+									"\r",
+									"    setNextMeterId();       \r",
+									"    setNextEAN();           \r",
+									"    setNextExtarnalId();    \r",
+									"    setColTimeSeries(); \r",
+									"\r",
+									" \r",
+									"/**  FUNCTIONS   */ \r",
+									"\r",
+									"function setNextMeterId() {\r",
+									"// GETTING NEXT meterId\r",
+									"    pm.test(\"Status code is 200\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"\r",
+									"    let tMeterId = '0';\r",
+									"   \r",
+									"    // Getting next meterId from Customer  // If empty, check if Meters exist in DB exist!\r",
+									"    const cJson = pm.response.json();\r",
+									"    let tJsonLength = JSON.stringify(cJson).length;\r",
+									"\r",
+									"    if (tJsonLength > 2) {\r",
+									"        tMeterId = parseInt(cJson.meterId);\r",
+									"        console.log(\"\\tSetting meterId from API to Collection. meterId: \".padEnd(100,'.') + tMeterId);\r",
+									"    } else {\r",
+									"        tMeterId = '0';\r",
+									"    };\r",
+									"    \r",
+									"    if (tMeterId != '0') {\r",
+									"        pm.collectionVariables.set('meterId', tMeterId);\r",
+									"    } else {\r",
+									"        throw('Not able to get a MeterId. Check to see if meter exist in Customer.');\r",
+									"    };\r",
+									"};\r",
+									"\r",
+									"function setNextEAN() {\r",
+									"    // GETTING NEXT EAN:\r",
+									"    // Using Environment variable 'InitListOfEan' and pop last EAN. Save it CollectoionVariable: 'colObjectIdSuper'\r",
+									"\r",
+									"\tlet tEAN = \"Empty\";\r",
+									"\tlet tabEAN = [];\r",
+									"\t\r",
+									"\ttEAN = pm.environment.get('InitListOfEan');\r",
+									"\t\r",
+									"    if (typeof(tEAN) == 'string') {\r",
+									"\t\t\ttabEAN = tEAN.split(';');\r",
+									"\t} else {\r",
+									"\t\ttabEAN = tEAN;\r",
+									"\t}\r",
+									"\t\r",
+									"\tlet lastEntry = tabEAN.pop();\r",
+									"\r",
+									"    pm.collectionVariables.set('colObjectIdSuper', lastEntry);\r",
+									"    pm.collectionVariables.set('colObjectId', lastEntry);           //USIKKER PÅ OM DEN KAN VÆRE HER ...\r",
+									"\tconsole.log(\"\\tUsing EAN: \".padEnd(100,'.') + lastEntry);\r",
+									"\t\r",
+									"\tpm.environment.set('InitListOfEan', tabEAN);   //Save list back with lastEAN popped out (How it works I do not know ???)\r",
+									"};\r",
+									"\r",
+									"function setNextExtarnalId() {\r",
+									"    // SETTING NEXT EXTERNALID\r",
+									"    var tId = pm.collectionVariables.get('colExternalCustomerId');\r",
+									"    var tNextId = tId.split('-');\r",
+									"    var tNum = parseInt(tNextId[1]) + 1;\r",
+									"    pm.collectionVariables.set('colExternalCustomerId', tNextId[0] + '-' + tNum )\r",
+									"    var tId2 = pm.collectionVariables.get('colExternalCustomerId');\r",
+									"    console.log('\\tNext ExternalID: '.padEnd(100,'.') + tId2);\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function setColTimeSeries() {\r",
+									"    // Recieve 2 String dates. Convert them to Date and return number of hours\r",
+									"\r",
+									"    let a = pm.collectionVariables.get('colFromDate');\r",
+									"    let b = pm.collectionVariables.get('colToDate');\r",
+									"//    console.log('a = ' + a + 'Typen er: ' + typeof(a));\r",
+									"//    console.log('b = ' + b + 'Typen er: ' + typeof(b));\r",
+									"\r",
+									"    let tDate1 = Date.parse(pm.collectionVariables.get('colFromDate'));\r",
+									"    let tDate2 = Date.parse(pm.collectionVariables.get('colToDate'));\r",
+									"\r",
+									"    let tDiff = (tDate2 - tDate1) / 3600000;\r",
+									"    let tStr = \"\";\r",
+									"    let tValue = 0\r",
+									"//        console.log('tDate1 = ' + tDate1 + 'Typen er: ' + typeof(tDate1));\r",
+									"//        console.log('tDate2 = ' + tDate2 + 'Typen er: ' + typeof(tDate2));\r",
+									"//        console.log('tDiff = ' + tDiff + ' Og typen er: ' + typeof(tDiff) );\r",
+									"\r",
+									"    for (i=0; i < tDiff; i++) {\r",
+									"        tValue = Math.floor((Math.random() * 10)+1)   // Kan brukes for Random\r",
+									"        tValue = (i + 1);\r",
+									"//        tStr = tStr + 'TimesSerie-' + i + ' Value =  ' + tValue   + '\\n\\r'\r",
+									"        tStr = tStr + \" {\\\"quantity\\\": \" + ((i % 24) + 1) + \", \\\"quality\\\": \\\"Measured\\\", \\\"validationMethod\\\": \\\"OtherValidations\\\", \\\"estimationMethod\\\": \\\"ActualVolumeAndHistoryBased\\\"},\" + '\\n\\r';\r",
+									"    }\r",
+									"\r",
+									"    tStr =  tStr.substring(0,(tStr.length - 3));  // Remove \"\\n\\r,\"\r",
+									"    pm.collectionVariables.set('colTimeSeries', tStr);\r",
+									"    tDays = tDiff / 24;\r",
+									"    console.log(\"\\tSaved TimeSeries.Values to colTimeSeries for: \".padEnd(100,'.') + tDays + ' days');\r",
+									"\r",
+									"    //let tStr2 = pm.collectionVariables.get('colTimeSeries')\r",
+									"    //console.log(tStr2);\r",
+									"\r",
+									"}\r",
+									"\r",
+									"\r",
+									"\r",
+									"} catch (err) {\r",
+									"    console.log('Not able to set Collection Variable colObjectIdSuper and More in Setting EAN, MeterID, Externale ....');\r",
+									"    console.error(err);\r",
+									"};\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/components/maxmeterid?meterId=8000&statusCode=2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"components",
+								"maxmeterid"
+							],
+							"query": [
+								{
+									"key": "meterId",
+									"value": "8000"
+								},
+								{
+									"key": "statusCode",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create new Customer on EAN",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"try {\r",
+									"\r",
+									"    pm.test(\"Create nedw Customer: Status code is 201\", function () {\r",
+									"        pm.response.to.have.status(201);\r",
+									"    });\r",
+									"\r",
+									"    const responseJSON = pm.response.json();\r",
+									"    let tActorId = responseJSON.actorId;\r",
+									"    const tExternalActorId = pm.collectionVariables.get('colExternalCustomerId');\r",
+									"    pm.collectionVariables.set('colActorId', tActorId);\r",
+									"    let tInvoiceAgreement = responseJSON.invoiceAgreementId;\r",
+									"    pm.collectionVariables.set('colInvoiceAgreementId', tInvoiceAgreement);\r",
+									"    let tWorkOrderId = responseJSON.workOrderId;\r",
+									"    pm.collectionVariables.set('colWorkOrderId', tWorkOrderId);\r",
+									"    let tDeliveryPointId = responseJSON.deliveryPointId;\r",
+									"    pm.collectionVariables.set('colDeliveryPointId', tDeliveryPointId);\r",
+									"\r",
+									"    console.log('\\tActorID created: '.padEnd(100,'.') + tActorId + ' \\t\\t\\tand ExternalActorId = ' + tExternalActorId + ' ( - GUID)');\r",
+									"    console.log('\\tInvoiceAgreement: '.padEnd(100,'.') + tInvoiceAgreement);\r",
+									"    console.log('\\tWorkOrderID: '.padEnd(100,'.') + tWorkOrderId);\r",
+									"    console.log('\\tDeliveryPointID: '.padEnd(100,'.') + tDeliveryPointId);\r",
+									"\r",
+									"    \r",
+									"    //console.log(JSON.stringify(responseJSON));  // Legger ut JSON som en String\r",
+									"    \r",
+									"\r",
+									"\r",
+									"\r",
+									"} catch (err) {\r",
+									"    console.error(err)\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"actor\": {\r\n        \r\n        \"externalCustomerId\": \"{{colExternalCustomerId}}\",\r\n        \"externalCustomerGUID\": \"{{colExternalCustomerId}} - GUID\",\r\n        \"firstName\": \"{{colFirstName}} - {{colExternalCustomerId}}\",\r\n        \"lastName\": \"{{colLastName}}\",\r\n        \"address\": {\r\n            \"zipCode\": \"5523\"\r\n        },\r\n        \"socialSecurityNumber\": \"31123320800\"\r\n    },\r\n    \"date\": \"{{colFromDate}}\",\r\n    \"invoiceAgreement\": {\r\n        \"invoiceAgreementCategory\": \"P\",\r\n        \"description\": \"Hus EDA\"\r\n    },\r\n    \"productLine\": {\r\n        \"consumptionCode\": \"35\",\r\n        \"billingGroup\": \"899\",\r\n        \"settlementMethod\": \"{{colSettlementMethod}}\",\r\n        \"estimatedAnnualConsumption\": 20002\r\n    },\r\n    \"meterPoint\": {\r\n        \"description\": \"Hus LeveransePunkt\",\r\n        \"address\": {\r\n            \"zipCode\": \"5523\"\r\n        },\r\n        \"meterNr\": \"{{meterId}}\",\r\n        \"gridArea\": \"{{InitMeteringGridAreaUsedDomainLocation}}\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customermanagement/moveins/:meterPointId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customermanagement",
+								"moveins",
+								":meterPointId"
+							],
+							"variable": [
+								{
+									"key": "meterPointId",
+									"value": "{{colObjectIdSuper}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Customer Change",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"try {\r",
+									"\r",
+									"    pm.test(\"Create nedw Customer: Status code is 201\", function () {\r",
+									"        pm.response.to.have.status(201);\r",
+									"    });\r",
+									"\r",
+									"    \r",
+									"    let tColObjectIdSuper = pm.collectionVariables.get('colObjectIdSuper');\r",
+									"    const responseJSON = pm.response.json();\r",
+									"    let tActorId = responseJSON.actorId;\r",
+									"    let tColCustomerChangeDate = pm.collectionVariables.get('colCustomerChangeDate');\r",
+									"\r",
+									"    console.log('\\tNy kunde har overtatt EAN: ' + tColObjectIdSuper + '. Den nye kunde er: ' + tActorId + ' og flyttet inn den: ' + tColCustomerChangeDate);\r",
+									"\r",
+									"\r",
+									"//    På EAN: xx, har kunde: yy flyttet inn fra dd.mm.yy\r",
+									"//    'Ny kunde har overtatt EAN: ' + tColObjectIdSuper + '. Den nye kunde er: ' + tActorId + ' og flyttet inn den: \" + tColCustomerChangeDate\r",
+									"\r",
+									"/*    console.log('\\tActorID created: '.padEnd(100,'.') + tActorId);\r",
+									"    console.log('\\tInvoiceAgreement: '.padEnd(100,'.') + tInvoiceAgreement);\r",
+									"    console.log('\\tWorkOrderID: '.padEnd(100,'.') + tWorkOrderId);\r",
+									"    console.log('\\tDeliveruPointID: '.padEnd(100,'.') + tDeliveryPointId);\r",
+									"*/\r",
+									"    \r",
+									"    //console.log(JSON.stringify(responseJSON));  // Legger ut JSON som en String\r",
+									"    \r",
+									"\r",
+									"\r",
+									"\r",
+									"} catch (err) {\r",
+									"    console.error(err)\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"actor\": {                                      \r\n        \"externalCustomerId\": \"{{colExternalCustomerId}}-Ny\",\r\n        \"externalCustomerGUID\": \"{{colExternalCustomerId}} - GUID-Ny\",\r\n        \"firstName\": \"{{colFirstName}} - {{colExternalCustomerId}}- Ny\",\r\n        \"lastName\": \"eda\",                              \r\n        \"address\": {\r\n            \"zipCode\": \"5523\"\r\n        },\r\n        \"socialSecurityNumber\": \"31123320800\"\r\n    },\r\n    \"date\": \"{{colCustomerChangeDate}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customermanagement/moveins/:meterPointId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customermanagement",
+								"moveins",
+								":meterPointId"
+							],
+							"variable": [
+								{
+									"key": "meterPointId",
+									"value": "{{colObjectIdSuper}}"
+								}
+							]
+						},
+						"description": "Customer Change - Requirements:\n\nCollectionVariables:\n\n- colObjectIdSuper - EAN\n- colCustomerChangeDate - Date\n    \n\nPathVar:\n\n- meterId = {{colObjectIdSuper}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Move-In to existing EAN",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"try {\r",
+									"\r",
+									"    pm.test(\"Move-In to existing EAN: Status code is 201\", function () {\r",
+									"        pm.response.to.have.status(201);\r",
+									"    });\r",
+									"\r",
+									"\r",
+									"    const responseJSON = pm.response.json();\r",
+									"    let tActorId = responseJSON.actorId;\r",
+									"    pm.collectionVariables.set('colActorId', tActorId);\r",
+									"    let tInvoiceAgreement = responseJSON.invoiceAgreementId;\r",
+									"    pm.collectionVariables.set('colInvoiceAgreementId', tInvoiceAgreement);\r",
+									"    let tWorkOrderId = responseJSON.workOrderId;\r",
+									"    pm.collectionVariables.set('colWorkOrderId', tWorkOrderId);\r",
+									"    let tDeliveryPointId = responseJSON.deliveryPointId;\r",
+									"    pm.collectionVariables.set('colDeliveryPointId', tDeliveryPointId);\r",
+									"\r",
+									"    console.log('\\tActorID created: '.padEnd(100,'.') + tActorId);\r",
+									"    console.log('\\tInvoiceAgreement: '.padEnd(100,'.') + tInvoiceAgreement);\r",
+									"    console.log('\\tWorkOrderID: '.padEnd(100,'.') + tWorkOrderId);\r",
+									"    console.log('\\tDeliveruPointID: '.padEnd(100,'.') + tDeliveryPointId);\r",
+									"\r",
+									"    \r",
+									"    //console.log(JSON.stringify(responseJSON));  // Legger ut JSON som en String\r",
+									"    \r",
+									"\r",
+									"\r",
+									"\r",
+									"} catch (err) {\r",
+									"    console.error(err)\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"setNextExtarnalId()\r",
+									"\r",
+									"\r",
+									"\r",
+									"function setNextExtarnalId() {\r",
+									"    // SETTING NEXT EXTERNALID\r",
+									"    var tId = pm.collectionVariables.get('colExternalCustomerId');\r",
+									"    var tNextId = tId.split('-');\r",
+									"    var tNum = parseInt(tNextId[1]) + 1;\r",
+									"    pm.collectionVariables.set('colExternalCustomerId', tNextId[0] + '-' + tNum )\r",
+									"    var tId2 = pm.collectionVariables.get('colExternalCustomerId');\r",
+									"    console.log('\\tNext ExternalID: '.padEnd(100,'.') + tId2);\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"date\": \"{{colFromDate}}\",\r\n\r\n\r\n\r\n  \"actor\": {\r\n              \"firstName\": \"{{colFirstName}} - {{colExternalCustomerId}}\",\r\n        \"lastName\": \"{{colLastName}}\",\r\n        \"address\": {\r\n            \"zipCode\": \"5523\"\r\n        },\r\n        \"socialSecurityNumber\": \"31123320800\",    \r\n        \"externalCustomerId\":   \"{{colExternalCustomerId}}\",\r\n        \"externalCustomerGUID\": \"{{colExternalCustomerId}} - GUID\"\r\n  },\r\n\r\n  \"productLine\": {\r\n    \"consumptionCode\": \"35\",\r\n    \"supplierId\": \"7080003816474\",\r\n    \"settlementMethod\": \"Hourly\",\r\n    \"billingGroup\": \"899\",\r\n    \"estimatedAnnualConsumption\": 20002\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customermanagement/moveins/:meterPointId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customermanagement",
+								"moveins",
+								":meterPointId"
+							],
+							"variable": [
+								{
+									"key": "meterPointId",
+									"value": "{{colObjectId}}"
+								}
+							]
+						},
+						"description": "Variabler som må settes:\n\ncolObjectId - EAN  \ncolFromDate - Oppstartsdato  \ncolExternalCustomerId - Ekstern kundeReferanse  \ncolFirstName -  \ncolLastName -"
+					},
+					"response": []
+				},
+				{
+					"name": "Move-In to existing EAN & Actor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"try {\r",
+									"\r",
+									"    pm.test(\"Move-In to existing EAN: Status code is 201\", function () {\r",
+									"        pm.response.to.have.status(201);\r",
+									"    });\r",
+									"\r",
+									"\r",
+									"    const responseJSON = pm.response.json();\r",
+									"    let tActorId = responseJSON.actorId;\r",
+									"    pm.collectionVariables.set('colActorId', tActorId);\r",
+									"    let tInvoiceAgreement = responseJSON.invoiceAgreementId;\r",
+									"    pm.collectionVariables.set('colInvoiceAgreementId', tInvoiceAgreement);\r",
+									"    let tWorkOrderId = responseJSON.workOrderId;\r",
+									"    pm.collectionVariables.set('colWorkOrderId', tWorkOrderId);\r",
+									"    let tDeliveryPointId = responseJSON.deliveryPointId;\r",
+									"    pm.collectionVariables.set('colDeliveryPointId', tDeliveryPointId);\r",
+									"\r",
+									"    console.log('\\tActorID created: '.padEnd(100,'.') + tActorId);\r",
+									"    console.log('\\tInvoiceAgreement: '.padEnd(100,'.') + tInvoiceAgreement);\r",
+									"    console.log('\\tWorkOrderID: '.padEnd(100,'.') + tWorkOrderId);\r",
+									"    console.log('\\tDeliveruPointID: '.padEnd(100,'.') + tDeliveryPointId);\r",
+									"\r",
+									"    \r",
+									"    //console.log(JSON.stringify(responseJSON));  // Legger ut JSON som en String\r",
+									"    \r",
+									"\r",
+									"\r",
+									"\r",
+									"} catch (err) {\r",
+									"    console.error(err)\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"date\": \"{{colFromDate}}\",\r\n\r\n\r\n\r\n  \"actor\": {\r\n        \"externalCustomerId\":   \"{{colExternalCustomerId}}\",\r\n        \"externalCustomerGUID\": \"{{colExternalCustomerId}} - GUID\"\r\n  },\r\n\r\n  \"productLine\": {\r\n    \"consumptionCode\": \"35\",\r\n    \"supplierId\": \"7080003816474\",\r\n    \"settlementMethod\": \"Hourly\",\r\n    \"billingGroup\": \"899\",\r\n    \"estimatedAnnualConsumption\": 20002\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customermanagement/moveins/:meterPointId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customermanagement",
+								"moveins",
+								":meterPointId"
+							],
+							"variable": [
+								{
+									"key": "meterPointId",
+									"value": "{{colObjectId}}"
+								}
+							]
+						},
+						"description": "Variabler som må settes:\n\ncolObjectId - EAN  \ncolFromDate - Oppstartsdato  \ncolExternalCustomerId - Ekstern kundeReferanse  \ncolFirstName -  \ncolLastName -"
+					},
+					"response": []
+				}
+			],
+			"description": "Cunstomer New and change\n\nFølgende Collectionvariable må settes/sjekkes før start:\n\n- colFirstName - First name\n- colLastName - Last Name\n- colFromDate - Start date of sales orders\n- colCustomerChangeDate - StartDate fro new customer\n- colSettlementMethod - (PPC or Hourly)\n    \n\nEnvironment Variable:\n\n- StartFragmentInitListOfEan - EAn separated by ;\n    \n\nFølgende Collectionvariable blir satt av \"Setting EAN, meterId, ExternalId, TS\":\n\n- meterId - Setting EAN, meterId, ExternalId, TS\n- colObjectId - Setting EAN, meterId, ExternalId, TS\n- colExternalCustomerId - Setting EAN, meterId, ExternalId, TS\n- colTimeSeries - Setting EAN, meterId, ExternalId, TS - Used to store payload for TimeSeries (Not implemented)\n    \n\nFølgende Collectionvariable blir satt av \"Create new Customer on EAN\":\n\n- colActorId - Set by \"Create new Customer on EAN\"\n- colInvoiceAgreementId - Set by \"Create new Customer on EAN\"\n- colWorkOrderId - Set by \"Create new Customer on EAN\"\n- colDeliveryPointId - Set by \"Create new Customer on EAN\"\n    \n\nStartFragment\n\nPå gitt leveringspunkt skjer følgende:\n\n- Setting EAN, meterId, ExternalId, TS\n- Create new Customer on EAN\n- Customer Change"
+		},
+		{
+			"name": "SalesOrder Terminate and Annul",
+			"item": [
+				{
+					"name": "Annul SalesOrders (Cancel move-in)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const tObjectId = pm.collectionVariables.get('colObjectId');\r",
+									"const tChangeDate  = pm.collectionVariables.get('colCustomerChangeDate');\r",
+									"\r",
+									"console.log('\\tAnulerer EAN: ' + tObjectId + ' og bytte dato = ' + tChangeDate );"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customermanagement/salesorders/{{colObjectIdSuper}}/{{colCustomerChangeDate}}/annul?reactivate=true",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customermanagement",
+								"salesorders",
+								"{{colObjectIdSuper}}",
+								"{{colCustomerChangeDate}}",
+								"annul"
+							],
+							"query": [
+								{
+									"key": "reactivate",
+									"value": "true"
+								}
+							]
+						},
+						"description": "Require:\n\n- colObjectId - Has value\n- colCustomerChangeDate - Has Value\n    \n\nparams:\n\n- reactivate = true"
+					},
+					"response": []
+				},
+				{
+					"name": "Terminate SalesOrders",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const tObjectId = pm.collectionVariables.get('colObjectId');\r",
+									"const tChangeDate  = pm.collectionVariables.get('colFromDate');\r",
+									"\r",
+									"console.log('\\tTerminate SalesOrders: ' + tObjectId + ' Fra dato = ' + tChangeDate );"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"meterPointId\": \"{{colObjectId}}\",\r\n  \"terminationDate\": \"{{colFromDate}}\",\r\n  \"includeUnfinishedInvoices\": true,\r\n  \"setSalesOrderFutureToDate\": false,\r\n  \"workOrderCauseType\": \"ChangeOfLegalOwnership\",\r\n  \"executeImmediately\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customermanagement/terminations/terminatesalesorder",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customermanagement",
+								"terminations",
+								"terminatesalesorder"
+							]
+						},
+						"description": "Require:\n\n- colObjectId - Has value\n- colCustomerChangeDate - Has Value\n    \n\nparams:\n\n- reactivate = true"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Supplier change and Revert",
+			"item": [
+				{
+					"name": "Supplier Change",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"try {\r",
+									"\r",
+									"    pm.test(\"Supplier change: Status code is 201\", function () {\r",
+									"        pm.response.to.have.status(201);\r",
+									"    });\r",
+									"\r",
+									"    tSupplierId = pm.collectionVariables.get('colSupplierId');\r",
+									"    tObjectId = pm.collectionVariables.get('colObjectId');\r",
+									"    tFromDate = pm.collectionVariables.get('colSupplierChangeDate');\r",
+									"\r",
+									"    if (pm.response.code == 201) {\r",
+									"        console.log('\\tSupplier changed to: ' + tSupplierId + ' on EAN: ' + tObjectId + '. Starting date: ' + tFromDate )\r",
+									"    } else {\r",
+									"        throw('Not able to change supplier on EAN: ' + tObjectId)\r",
+									"    }\r",
+									"\r",
+									"\r",
+									"} catch (err) {\r",
+									"    postman.setNextRequest(null);\r",
+									"    console.error(err)\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"date\": \"{{colSupplierChangeDate}}\",\r\n  \"supplierId\": \"{{colSupplierId}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customermanagement/supplierchanges/{{colObjectId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customermanagement",
+								"supplierchanges",
+								"{{colObjectId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Revert Supplier change",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"try {\r",
+									"\r",
+									"    pm.test(\"Revert Supplier change: Status code is 200\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"\r",
+									"    tSupplierId = pm.collectionVariables.get('colSupplierId');\r",
+									"    tObjectId = pm.collectionVariables.get('colObjectId');\r",
+									"    tFromDate = pm.collectionVariables.get('colSupplierChangeDate');\r",
+									"\r",
+									"    if (pm.response.code == 200) {\r",
+									"        console.log('\\tRevert Supplier changed on EAN: ' + tObjectId + ' with Starting date: ' + tFromDate )\r",
+									"    } else {\r",
+									"        throw('Not able to revert the supplier change on EAN: ' + tObjectId)\r",
+									"    }\r",
+									"\r",
+									"} catch (err) {\r",
+									"    postman.setNextRequest(null);\r",
+									"    console.error(err)\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customermanagement/supplierchanges/{{colObjectId}}/{{colSupplierChangeDate}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customermanagement",
+								"supplierchanges",
+								"{{colObjectId}}",
+								"{{colSupplierChangeDate}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Supplier Change and Revert\n\nFølgende Collectionvariable må settes/sjekkes før start:\n\n- colFromDate - Start date of sales orders\n- colObjectId - EAN\n- colSupplierId - GLN\n    \n\nPå gitt leveringspunkt skjer følgende:\n\n- Supplier Change\n- Revert Supplier Change"
+		},
+		{
+			"name": "Settlement Method change and revert",
+			"item": []
+		},
+		{
+			"name": "Extra functionality",
+			"item": [
+				{
+					"name": "GET MeterID - ChangeToDate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"try {\r",
+									"    pm.test(\"Status code is 200\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"\r",
+									"    if (pm.response.code != 200) {throw ('Something is missing.....')};\r",
+									"\r",
+									"    const responseJSON = JSON.parse(pm.response.text()); \r",
+									"    let tMeterId = responseJSON.meterId;\r",
+									"    pm.collectionVariables.set('colMeterIdChangeTo', tMeterId);\r",
+									"\r",
+									"    const tColMeterChangeDate = pm.collectionVariables.get('colMeterChangeDate');\r",
+									"    const tColObjectId = pm.collectionVariables.get('colObjectId');\r",
+									"\r",
+									"    console.log('\\tNew meterId set to \"colMeterIdChangeTo\": '.padEnd(100,'.') + tMeterId + ' MeterChangeDate: ' + tColMeterChangeDate + ' EAN: ' + tColObjectId)  ;\r",
+									"\r",
+									"} catch (err) {\r",
+									"    postman.setNextRequest(null);\r",
+									"    console.error (err);\r",
+									"};\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/components/maxmeterid?meterId=8000&statusCode=2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"components",
+								"maxmeterid"
+							],
+							"query": [
+								{
+									"key": "meterId",
+									"value": "8000"
+								},
+								{
+									"key": "statusCode",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actor Update name to DELETED",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"try {\r",
+									"    pm.test(\"Status code is 200\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"\r",
+									"    if (pm.response.code != 200) {throw ('Something is missing.....')};\r",
+									"\r",
+									"    const responseJSON = JSON.parse(pm.response.text()); \r",
+									"    let tMeterId = responseJSON.meterId;\r",
+									"    pm.collectionVariables.set('colMeterIdChangeTo', tMeterId);\r",
+									"\r",
+									"    const tColMeterChangeDate = pm.collectionVariables.get('colMeterChangeDate');\r",
+									"    const tColObjectId = pm.collectionVariables.get('colObjectId');\r",
+									"\r",
+									"    console.log('\\tNew meterId set to \"colMeterIdChangeTo\": '.padEnd(100,'.') + tMeterId + ' MeterChangeDate: ' + tColMeterChangeDate + ' EAN: ' + tColObjectId)  ;\r",
+									"\r",
+									"} catch (err) {\r",
+									"    postman.setNextRequest(null);\r",
+									"    console.error (err);\r",
+									"};\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": {{colActorId}},\r\n  \"firstName\": \"SHOULD NOT BE USED\",\r\n  \"lastName\": \"--- DELETED ---\"\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/actors",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"actors"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Create TimeSeries",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<timeSeriesImported contentType=\"application/vnd.com.infosynergi.ismetering.jms.TimeSeriesImported-v1+xml\">\r\n    <owner>GridOperator</owner>\r\n    <submitter>EDA</submitter> \r\n    <transactionId>45</transactionId>\r\n    <value>\r\n        <meterPointId>707057500087770477</meterPointId>\r\n        <gridArea>GridArea</gridArea>\r\n        <direction>Out</direction>\r\n        <resolution>SixtyMinutes</resolution>\r\n        <fromTime>2022-09-11T00:00+02:00[Europe/Berlin]</fromTime>\r\n          <toTime>2022-09-12T00:00+02:00[Europe/Berlin]</toTime>\r\n        <product>ActiveEnergy</product>\r\n        <unit>kWh</unit>\r\n        <values>\r\n            <value fromTime=\"2022-09-11T00:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T01:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"9.3\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T01:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T02:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"9.3\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T02:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T03:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"2.3\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T03:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T04:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"3.3\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T04:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T05:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"4.3\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T05:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T06:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"5.3\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T06:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T07:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"6.3\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T07:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T08:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"7.3\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T08:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T09:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"8.3\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T09:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T10:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"9.3\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T10:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T11:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"10.0\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T11:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T12:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"1.0\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T12:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T13:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"2.0\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T13:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T14:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"3.0\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T14:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T15:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"14.0\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T15:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T16:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"15.0\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T16:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T17:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"16.0\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T17:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T18:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"17.0\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T18:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T19:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"18.0\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T19:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T20:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"19.0\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T20:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T21:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"20.0\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T21:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T22:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"21.0\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T22:00+02:00[Europe/Berlin]\" toTime=\"2022-09-11T23:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"22.0\" quality=\"Measured\" />\r\n            <value fromTime=\"2022-09-11T23:00+02:00[Europe/Berlin]\" toTime=\"2022-10-01T00:00+02:00[Europe/Berlin]\" correction=\"false\" quantity=\"23.0\" quality=\"Measured\" />\r\n        </values>\r\n    </value>\r\n</timeSeriesImported>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://juniorelvia.infosynergi.no:9099/api/message/TimeSeriesImported?type=topic",
+					"protocol": "http",
+					"host": [
+						"juniorelvia",
+						"infosynergi",
+						"no"
+					],
+					"port": "9099",
+					"path": [
+						"api",
+						"message",
+						"TimeSeriesImported"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "topic"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "{{gPWD}}",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "{{gUID}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "---  START VALUES  ---",
+			"value": "MUST BE SET",
+			"type": "string"
+		},
+		{
+			"key": "colFirstName",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "colLastName",
+			"value": "eda",
+			"type": "string"
+		},
+		{
+			"key": "colObjectId",
+			"value": "Input: EAN Goes here",
+			"type": "string"
+		},
+		{
+			"key": "colFromDate",
+			"value": "2022-01-01",
+			"type": "string"
+		},
+		{
+			"key": "colToDate",
+			"value": "2022-02-01",
+			"type": "string"
+		},
+		{
+			"key": "colCustomerChangeDate",
+			"value": "Date for new customer",
+			"type": "string"
+		},
+		{
+			"key": "colMeterChangeDate",
+			"value": "Default: 2022-08-15",
+			"type": "string"
+		},
+		{
+			"key": "colSettlementMethod",
+			"value": "Hourly",
+			"type": "string"
+		},
+		{
+			"key": "colSupplierChangeDate",
+			"value": "2022-08-15",
+			"type": "string"
+		},
+		{
+			"key": "colSupplierId",
+			"value": "7080003959874",
+			"type": "string"
+		},
+		{
+			"key": "--- RUNNING VALUES ---",
+			"value": "SET BY REQUESTS",
+			"type": "string"
+		},
+		{
+			"key": "colActorId",
+			"value": "Create new Customer on EAN",
+			"type": "string"
+		},
+		{
+			"key": "colDeliveryPointId",
+			"value": "Create new Customer on EAN",
+			"type": "string"
+		},
+		{
+			"key": "colExternalCustomerId",
+			"value": "Setting EAN, meterId, ExternalId, TS",
+			"type": "string"
+		},
+		{
+			"key": "colInvoiceAgreementId",
+			"value": "Create new Customer on EAN",
+			"type": "string"
+		},
+		{
+			"key": "colLevPointId",
+			"value": "Set by \"Get current deliveryPointId\"",
+			"type": "string"
+		},
+		{
+			"key": "colMeterIdChangeTo",
+			"value": "SQL finnes her:\nselect to_number (regexp_replace(maalerid, '[^[:digit:]]', '')) as newId from maaler where maalerid like 'EDA-CC-%' order by newId desc;"
+		},
+		{
+			"key": "meterId",
+			"value": "Setting EAN, meterId, ExternalId, TS",
+			"type": "string"
+		},
+		{
+			"key": "colObjectIdSuper",
+			"value": "Setting EAN, meterId, ExternalId, TS",
+			"type": "string"
+		},
+		{
+			"key": "colPlaceOfConsumtionDescription",
+			"value": "Set by \"Update Place Of Consumtion description\"",
+			"type": "string"
+		},
+		{
+			"key": "colTimeSeries",
+			"value": "Setting EAN, meterId, ExternalId, TS",
+			"type": "string"
+		},
+		{
+			"key": "colWorkOrderId",
+			"value": "Create new Customer on EAN",
+			"type": "string"
+		},
+		{
+			"key": "colTestId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
